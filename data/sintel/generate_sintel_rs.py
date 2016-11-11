@@ -14,7 +14,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dir_data', default='.')
 args = parser.parse_args()
 
-dir_source = join(args.dir_data, 'sources_18')
+#dir_source = join(args.dir_data, 'sources_18')
+dir_source = join(args.dir_data, 'sources')
 dir_img = join(args.dir_data, 'images')
 
 sa = 'albedo'
@@ -32,9 +33,13 @@ def load_list(p):
 paths = {}
 for k in keys:
     paths[k] = load_list(sources[k])
+
+print(paths)
+print(len(paths[sc]))
     
-for i in range(len(paths[sa])):
+for i in range(len(paths[sc])):
     imgs = {}
+    print(i)
     for k in keys:
         imgs[k] = imread(join(dir_img, paths[k][i])).astype(np.float32) / 255
     rs = imgs[sa] * imgs[ss]
