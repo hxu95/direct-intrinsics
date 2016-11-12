@@ -34,12 +34,10 @@ paths = {}
 for k in keys:
     paths[k] = load_list(sources[k])
 
-print(paths)
-print(len(paths[sc]))
-    
+# modify all imgs in clean and put in RS
 for i in range(len(paths[sc])):
     imgs = {}
-    print(i)
+    #print(i)
     for k in keys:
         imgs[k] = imread(join(dir_img, paths[k][i])).astype(np.float32) / 255
     rs = imgs[sa] * imgs[ss]
