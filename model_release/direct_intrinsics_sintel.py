@@ -34,7 +34,7 @@ scene = di.sintel_scenes['train'][scene_id]
 # scene = di.sintel_scenes['test'][scene_id]
 print scene
 #manual definition
-img = cv2.imread('/home/hxu/data/sintel/images_mit_sintel/clean/{}/frame_0010.png'.format(scene))
+img = cv2.imread('/home/hxu/di-final/data/sintel/images_mit_sintel/clean/{}/frame_0010.png'.format(scene))
 
 
 # In[5]:
@@ -55,4 +55,4 @@ plt.imshow(a)
 plt.figure()
 plt.title('shading')
 plt.imshow(s)
-
+plt.show()
