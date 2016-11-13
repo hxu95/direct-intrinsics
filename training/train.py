@@ -3,6 +3,7 @@
 
 # Set python path here
 import sys
+sys.path.append('/home/hxu/di-final/modified_caffe/caffe/python')
 sys.path.append('/home/hxu/caffe/python')
 sys.path.append('/home/hxu/caffe_main/python')
 import caffe

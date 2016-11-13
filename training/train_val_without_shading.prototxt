@@ -8,7 +8,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/sintel/sources_18_barron_mit2_sintel_balance/source_RS_train.txt'), root=expandvars('/home/hxu/di-final/sintel/sintel/images_mit_sintel/'), mirror=True, shuffle=True, mean_value=[104, 117, 123], crop_size=(416, 416), pad=0, random_crop=True, random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15, border_mode='BORDER_REFLECT')"
+    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/data/sintel/sources_18_barron_mit2_sintel_balance/source_RS_train.txt'), root=expandvars('/home/hxu/di-final/data/sintel/images_mit_sintel/'), mirror=True, shuffle=True, mean_value=[104, 117, 123], crop_size=(416, 416), pad=0, random_crop=True, random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15, border_mode='BORDER_REFLECT')"
   }
   include: { phase: TRAIN }
 }
@@ -22,7 +22,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/sintel/sintel/sources_18_barron_mit2_sintel_balance/source_albedo_train.txt'), root=expandvars('/home/hxu/di-final/sintel/sintel/images_mit_sintel/'), mirror=True, shuffle=True, color=True, crop_size=(416, 416), pad=0, random_crop=True, scale=1/256., random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15)"
+    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/data/sintel/sources_18_barron_mit2_sintel_balance/source_albedo_train.txt'), root=expandvars('/home/hxu/di-final/data/sintel/images_mit_sintel/'), mirror=True, shuffle=True, color=True, crop_size=(416, 416), pad=0, random_crop=True, scale=1/256., random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15)"
   }
   include: { phase: TRAIN }
 }
@@ -38,7 +38,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/sintel/sintel/sources_18_barron_mit2_sintel_balance/source_albedo_defect_mask_train.txt'), root=expandvars('/home/hxu/di-final/sintel/sintel/images_mit_sintel/'), mirror=True, shuffle=True, color=True, crop_size=(416, 416), pad=0, random_crop=True, random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15)"
+    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/data/sintel/sources_18_barron_mit2_sintel_balance/source_albedo_defect_mask_train.txt'), root=expandvars('/home/hxu/di-final/data/sintel/images_mit_sintel/'), mirror=True, shuffle=True, color=True, crop_size=(416, 416), pad=0, random_crop=True, random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15)"
   }
   include: { phase: TRAIN }
 }
@@ -51,7 +51,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/sintel/sintel/sources_18_barron_mit2_sintel_balance/source_RS_test.txt'), root=expandvars('/home/hxu/di-final/sintel/sintel/images_mit_sintel/'), mean_value=[104, 117, 123], crop_size=(416, 416), shuffle=True, pad=0)"
+    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/data/sintel/sources_18_barron_mit2_sintel_balance/source_RS_test.txt'), root=expandvars('/home/hxu/di-final/data/sintel/images_mit_sintel/'), mean_value=[104, 117, 123], crop_size=(416, 416), shuffle=True, pad=0)"
   }
   include: { phase: TEST }
 }
@@ -65,7 +65,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/sintel/sintel/sources_18_barron_mit2_sintel_balance/source_albedo_test.txt'), root=expandvars('/home/hxu/di-final/sintel/sintel/images_mit_sintel/)', color=True, crop_size=(416, 416), scale=1/256., shuffle=True, pad=0)"
+    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/data/sintel/sources_18_barron_mit2_sintel_balance/source_albedo_test.txt'), root=expandvars('/home/hxu/di-final/data/sintel/images_mit_sintel/)', color=True, crop_size=(416, 416), scale=1/256., shuffle=True, pad=0)"
   }
   include: { phase: TEST }
 }
@@ -79,7 +79,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/sintel/sintel/sources_18_barron_mit2_sintel_balance/source_albedo_defect_mask_test.txt'), root=expandvars('/home/hxu/di-final/sintel/sintel/images_mit_sintel/'), color=True, crop_size=(416, 416), shuffle=True, pad=0)"
+    param_str: "dict(batch_size=4, source=expandvars('/home/hxu/di-final/data/sintel/sources_18_barron_mit2_sintel_balance/source_albedo_defect_mask_test.txt'), root=expandvars('/home/hxu/di-final/data/sintel/images_mit_sintel/'), color=True, crop_size=(416, 416), shuffle=True, pad=0)"
   }
   include: { phase: TEST }
 }

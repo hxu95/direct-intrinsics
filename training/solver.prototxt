@@ -1,4 +1,4 @@
-net: "train_val.prototxt"
+net: "train_val_without_shading.prototxt"
 base_lr: 0.002
 display: 1
 average_loss: 1
