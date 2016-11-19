@@ -5,7 +5,7 @@ import os
 	# noshadow/
 	# shadow/
 # elems = ['albedo_defect_mask', 'albedo', 'clean']
-elems = ['shadows', 'noshadows']
+elems = ['shadow', 'noshadow']
 prefix = './images/'
 
 # write all filenames in directories into outdir
