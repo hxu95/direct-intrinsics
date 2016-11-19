@@ -1,2 +1,5 @@
 *.pyc
 *~
+data/synthetic/images
+data/synthetic/synthetic_images.zip
+modified_caffe/caffe_helper
