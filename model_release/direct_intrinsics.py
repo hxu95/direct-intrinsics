@@ -57,6 +57,7 @@ def predict(net, img):
     # Predict and get the outputs albedo and shading
     out = net.forward()
     a = out['out-albedo'].copy()
-    s = out['out-shading'].copy()
+    #s = out['out-shading'].copy()
     # Appy post processes before returning
-    return post_process(a, pad), post_process(s, pad)
+    #return post_process(a, pad), post_process(s, pad)
+    return post_process(a, pad)
