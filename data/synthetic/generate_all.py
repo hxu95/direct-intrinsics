@@ -1,7 +1,11 @@
 import os
 
 #start in synthetic/ dir
-elems = ['albedo_defect_mask', 'albedo', 'clean']
+# dir structure of synthetic/
+	# noshadow/
+	# shadow/
+# elems = ['albedo_defect_mask', 'albedo', 'clean']
+elems = ['shadows', 'noshadows']
 prefix = './images/'
 
 # write all filenames in directories into outdir
