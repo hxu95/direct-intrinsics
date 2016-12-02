@@ -1,0 +1,13 @@
+net: "train_val_fcn8s.prototxt"
+base_lr: 0.002
+display: 1
+average_loss: 20
+max_iter: 412500
+momentum: 0.99
+weight_decay: 0.0005
+snapshot: 1000
+snapshot_prefix: "snapshot_"
+lr_policy: "fixed"
+power: 0.5
+iter_size: 1
+iter_size: 1
