@@ -9,7 +9,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/sources/source_shadow_train.txt'), root=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/images/'), mirror=True, shuffle=True, mean_value=[104, 117, 123], crop_size=(416, 416), pad=0, random_crop=True, random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15, border_mode='BORDER_REFLECT')"
+    param_str: "dict(batch_size=4, source=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/sources/source_shadow_train.txt'), root=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/images/'), mirror=True, shuffle=True, mean_value=[104, 117, 123], crop_size=(380, 380), pad=0, random_crop=True, random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15, border_mode='BORDER_REFLECT')"
   }
   include: { phase: TRAIN }
 }
@@ -20,7 +20,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/sources/source_noshadow_train.txt'), root=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/images/'), mirror=True, shuffle=True, color=True, crop_size=(416, 416), pad=0, random_crop=True, scale=1/256., random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15)"
+    param_str: "dict(batch_size=4, source=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/sources/source_noshadow_train.txt'), root=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/images/'), mirror=True, shuffle=True, color=True, crop_size=(472, 472), pad=0, random_crop=True, scale=1/256., random_scale=(1.0-0.2, 1.0+0.2), random_rotation=15)"
   }
   include: { phase: TRAIN }
 }
@@ -34,7 +34,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/sources/source_shadow_test.txt'), root=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/images/'), mean_value=[104, 117, 123], crop_size=(416, 416), shuffle=True, pad=0)"
+    param_str: "dict(batch_size=4, source=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/sources/source_shadow_test.txt'), root=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/images/'), mean_value=[104, 117, 123], crop_size=(380, 380), shuffle=True, pad=0)"
   }
   include: { phase: TEST }
 }
@@ -46,7 +46,7 @@ layer {
   python_param {
     module: "caffe_helper.layers.data_layers"
     layer: "ImageDataLayer"
-    param_str: "dict(batch_size=4, source=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/sources/source_noshadow_test.txt'), root=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/images/)', color=True, crop_size=(416, 416), scale=1/256., shuffle=True, pad=0)"
+    param_str: "dict(batch_size=4, source=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/sources/source_noshadow_test.txt'), root=expandvars('/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/data/synthetic/images/)', color=True, crop_size=(472, 472), scale=1/256., shuffle=True, pad=0)"
   }
   include: { phase: TEST }
 }
@@ -653,39 +653,49 @@ layer {
   type: "Deconvolution"
   bottom: "fuse_pool3"
   top: "out-noshadow"
+  param {
+    lr_mult: 0
+  }
   convolution_param {
-    kernel_size: 8
-    stride: 4
+    kernel_size: 16
+    stride: 8
     num_output: 3
     group: 1
-    pad: 2
-    weight_filler: { type: "gaussian" std: 0.001 }
-    bias_term: true
+    bias_term: false
   }
-  param { lr_mult: 10 decay_mult: 1 }
-  param { lr_mult: 20 decay_mult: 0 }
 }
 
 ##### L2 loss for comparing shadows #####
 
-layer {
-  name: "log-noshadow"
-  bottom: "noshadow"
-  top: "noshadow"
-  type: "Python"
-  python_param {
-    module: "caffe_helper.layers.common_layers"
-    layer: "LogLayer"
-    param_str: "dict(offset=0.5)"
-  }
-}
+#layer {
+#  name: "log-noshadow"
+#  bottom: "noshadow"
+#  top: "noshadow"
+#  type: "Python"
+#  python_param {
+#    module: "caffe_helper.layers.common_layers"
+#    layer: "LogLayer"
+#    param_str: "dict(offset=0.5)"
+#  }
+#}
+
 layer {
   name: "loss-noshadow"
-  type: "HingeLoss"
+  type: "EuclideanLoss"
   bottom: "out-noshadow"
   bottom: "noshadow"
   top: "loss-noshadow"
-  hinge_loss_param {
-    norm: L2
-  }
 }
+#layer {
+#  name: "loss-noshadow"
+#  type: "Python"
+#  bottom: "out-noshadow"
+#  bottom: "noshadow"
+#  top: "loss-noshadow"
+#  loss_weight: 1
+#  python_param {
+#    module: "caffe_helper.layers.loss_layers"
+#    layer: "ScaleInvariantNoMaskL2LossLayer"
+#    param_str: "{'lambda': 0}"
+#  }
+#}
