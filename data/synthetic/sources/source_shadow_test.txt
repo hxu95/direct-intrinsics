@@ -22,7 +22,6 @@ shadow/sun-temple-outside/file127.png
 shadow/sun-temple-outside/file149.png
 shadow/sun-temple-outside/file157.png
 shadow/sun-temple-outside/file178.png
-
 shadow/blueprints/file509.png
 shadow/blueprints/file394.png
 shadow/blueprints/file303.png
