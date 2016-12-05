@@ -4,17 +4,24 @@ from os.path import join, dirname
 # to do evaluation - mse or ssim?
 # from skimage.measure import structural_similarity as ssim
 
-from util import rmse
+from util import rmse #, ssim, msssim
 
+# skimage installation instructions
+# http://stackoverflow.com/questions/38087558/import-error-no-module-named-skimage
+from skimage.measure import structural_similarity as ssim
+from skimage import color
+
+import matplotlib.image as mpimg
 import sys, cv2
 import numpy as np
 import os
 
 # path to direct intrinsics folder 
 # project_path = '/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/'
-project_path = '/home/hxu/di-final/'
+# project_path = '/home/hxu/di-final/'
+project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
 
-# not sure these paths are right
+
 # point to generated data with shadows
 # result_path = 'data/synthetic/images/results/'
 result_path = 'data/synthetic/images/shadow/'
@@ -56,7 +63,7 @@ for (dirpath, dirnames, filenames) in os.walk(truth_path):
         print key
         print value
 '''
-print truth_dict
+# print truth_dict
 
 
 # now do the experiment
@@ -79,42 +86,49 @@ for (dirpath, dirnames, filenames) in os.walk(experiment_path):
         print key
         print value
 '''
-print experiment_dict
+# print experiment_dict
 
 # check that they are the same size
 assert len(experiment_dict) == len(truth_dict)
 
-total_error = 0
+cumulative_rmse = 0
+cumulative_ssim = 0
 
 # iterate over dictionary
 for key in truth_dict:
     #make sure we have a match
     assert key in experiment_dict
+
+    # get matching files
     gt_file = truth_dict[key]
     exp_file = experiment_dict[key]
     print 'truth: {}'.format(gt_file)
     print 'experiment: {}'.format(exp_file)
 
-
-'''
-    # get paths of images
-
-
     # read in the images - can also read in as greyscale?
     # to_grayscale(imread(file1).astype(float))
-    gt_img = imread(gt_file)
-    exp_img = imread(exp_file)
+    gt_img = cv2.imread(gt_file)
+    exp_img = cv2.imread(exp_file)
+
+    if gt_img is None or exp_img is None:
+        continue
 
     #truth, experiment
+    assert gt_img.shape == exp_img.shape
     r = rmse(gt_img, exp_img)
     # r = sqrt(mean_squared_error(gt_img, exp_img))
     # can also use structural similarity
-    # s = ssim(gt_img, exp_img)
+    # have to convert to gray: http://stackoverflow.com/questions/32077285/ssim-image-compare-error-window-shape-incompatible-with-arr-in-shape
+    img1 = color.rgb2gray(gt_img)
+    img2 = color.rgb2gray(exp_img)
+    s = ssim(img1, img2)
 
     # add to total
-    total_error += r
+    cumulative_rmse += r
+    cumulative_ssim += s
 
 # report average difference
-print float(diff) / float(len(truth_dict))
-
-'''
+print 'RMSE'
+print float(cumulative_rmse) / float(len(truth_dict))
+print 'SSIM'
+print float(cumulative_ssim) / float(len(truth_dict))

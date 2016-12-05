@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import sys
 
 def rmse(imageA, imageB):
 	# the 'Mean Squared Error' between the two images is the
