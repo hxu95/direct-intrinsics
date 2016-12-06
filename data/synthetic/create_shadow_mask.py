@@ -8,6 +8,7 @@ import numpy as np
 import cv2
 
 import argparse
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--dir_data', default='.')
 
@@ -15,7 +16,8 @@ args = parser.parse_args()
 
 dir_shadow = join(args.dir_data, 'images', 'shadow')
 dir_noshadow = join(args.dir_data, 'images', 'noshadow')
-dir_out = join(args.dir_data, 'images', 'shadowmask')
+dir_out = join(args.dir_data, 'images', 'greyscale_shadowmask')
+dir_bw = join(args.dir_data, 'images', 'bw_shadowmask')
 
 
 prefix = './images/shadow'
@@ -49,28 +51,10 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
         except: pass
 
         result = noshadow_l_channel - shadow_l_channel
-        # result = noshadow - shadow
-        #result = cv2.cvtColor(result, cv2.COLOR_BGR2LAB)
-        #result_l, _, _ = cv2.split(result)
-        # cv2.imsave('shadow', shadow_l_channel)
-        # cv2.imsave('noshadow', noshadow_l_channel)
-        ''' 
-        recover = shadow - result
-        
-        #for some reason the second one doesn't pass?
-        try:
-            assert recover.shape == noshadow.shape
-            assert(shadow == noshadow + result).all()
-        except AssertionError:
-            _, _, tb = sys.exc_info()
-            traceback.print_tb(tb) # Fixed format
-            tb_info = traceback.extract_tb(tb)
-            filename, line, func, text = tb_info[-1]
 
-            print('An error occurred on line {} in statement {}'.format(line, text))
-            exit(1)
-        '''
+        # account for wraparound
         result[result > 230] = 0
+
         # print noshadow_l_channel
         # print shadow_l_channel
         # print result
@@ -82,18 +66,25 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
         # result = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
         # result = (255-gray_image)
 
-        # assert np.array_equal(np.array(noshadow), np.array(shadow - result))
+        # write greyscale mask
         cv2.imwrite(path_result, result)
 
+        # get directory of bw mask
+        dir_o = join(dir_bw, basename(dir_scene))
+        try: os.makedirs(dir_o)
+        except: pass
 
-        #imsave(path_result, result_l)
-        #break
+        # path
+        path_bw = join(dir_o, basename(path_shadow))
+        print 'path_bw: ' + path_bw
 
-        '''
-        plt.figure()
-        plt.title('input - mask')
-        plt.imshow(shadow - result)
-        plt.show()
-        '''
+        # thresholding less than
+        result[result < 50] = 0
+
+        # everything else to white
+        result[result > 0] = 255
+
+        # write bw path
+        cv2.imwrite(path_bw, result)
 
     # break

@@ -1,14 +1,15 @@
 # evaluate synthetic dataset results from net against generated ground truth
 from os.path import join, dirname
 
-# to do evaluation - mse or ssim?
 # from skimage.measure import structural_similarity as ssim
 
 from util import rmse #, ssim, msssim
 
 # skimage installation instructions
 # http://stackoverflow.com/questions/38087558/import-error-no-module-named-skimage
-from skimage.measure import structural_similarity as ssim
+from skimage.measure import compare_ssim as compare_ssim
+# deprecated?
+# from skimage.measure import structural_similarity as compare_ssim
 from skimage import color
 
 import matplotlib.image as mpimg
@@ -18,8 +19,8 @@ import os
 
 # path to direct intrinsics folder 
 # project_path = '/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/'
-# project_path = '/home/hxu/di-final/'
-project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
+project_path = '/home/hxu/di-final/'
+# project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
 
 
 # point to generated data with shadows
@@ -81,13 +82,6 @@ for (dirpath, dirnames, filenames) in os.walk(experiment_path):
 
         experiment_dict[key] = value
 
-'''
-        print filename
-        print key
-        print value
-'''
-# print experiment_dict
-
 # check that they are the same size
 assert len(experiment_dict) == len(truth_dict)
 
@@ -95,9 +89,9 @@ cumulative_rmse = 0
 cumulative_ssim = 0
 
 # iterate over dictionary
-for key in truth_dict:
+for key in experiment_dict:
     #make sure we have a match
-    assert key in experiment_dict
+    assert key in truth_dict
 
     # get matching files
     gt_file = truth_dict[key]
@@ -121,7 +115,7 @@ for key in truth_dict:
     # have to convert to gray: http://stackoverflow.com/questions/32077285/ssim-image-compare-error-window-shape-incompatible-with-arr-in-shape
     img1 = color.rgb2gray(gt_img)
     img2 = color.rgb2gray(exp_img)
-    s = ssim(img1, img2)
+    s = compare_ssim(img1, img2)
 
     # add to total
     cumulative_rmse += r
