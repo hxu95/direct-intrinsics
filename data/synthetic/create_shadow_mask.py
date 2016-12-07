@@ -30,7 +30,7 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
 
         shadow = cv2.imread(path_shadow)
         shadow = cv2.cvtColor(shadow, cv2.COLOR_BGR2LAB)
-        shadow_l_channel, _, _ = cv2.split(shadow)
+        shadow_l_channel, shadow_a_channel, shadow_b_channel = cv2.split(shadow)
         # print shadow
         # mask = np.repeat((albedo.mean(2) != 0).astype(np.uint8)[..., np.newaxis] * 255, 3, 2)
 
@@ -44,7 +44,7 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
         #path_noshadow = join(path_noshadow, basename(path_shadow))
         noshadow = cv2.imread(path_noshadow)
         noshadow = cv2.cvtColor(noshadow, cv2.COLOR_BGR2LAB)
-        noshadow_l_channel, _, _ = cv2.split(noshadow)
+        noshadow_l_channel, noshadow_a_channel, noshadow_b_channel = cv2.split(noshadow)
 
         dir_o = join(dir_out, basename(dir_scene))
         try: os.makedirs(dir_o)
@@ -62,9 +62,6 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
         print 'path_noshadow: ' + path_noshadow
         path_result = join(dir_o, basename(path_shadow))
         print 'path_result ' + path_result
-    
-        # result = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
-        # result = (255-gray_image)
 
         # write greyscale mask
         cv2.imwrite(path_result, result)
@@ -84,7 +81,7 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
         # everything else to white
         result[result > 0] = 255
 
-        # write bw path
+        # write bw mask
         cv2.imwrite(path_bw, result)
 
     # break

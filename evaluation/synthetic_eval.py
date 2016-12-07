@@ -12,7 +12,6 @@ from skimage.measure import compare_ssim as compare_ssim
 # from skimage.measure import structural_similarity as compare_ssim
 from skimage import color
 
-import matplotlib.image as mpimg
 import sys, cv2
 import numpy as np
 import os
