@@ -126,7 +126,7 @@ for key in experiment_dict:
     # print 'gt_l'
     # print gt_l_channel
 
-    assert gt_l_channel.size == exp_l_channel
+    assert gt_l_channel.size == exp_l_channel.size
     # add to total
     diff = np.sum(np.array(gt_l_channel) == np.array(exp_l_channel)) / float(gt_l_channel.size)
     cumulative_diff += diff

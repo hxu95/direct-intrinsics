@@ -113,9 +113,6 @@ for key in truth_dict:
         # subtract channels?
         result = noshadow_l_channel - shadow_l_channel
 
-        #invert
-        # result = (255 - result)
-
         # account for wraparound
         result[result > 220] = 0
 
@@ -138,8 +135,5 @@ for key in truth_dict:
         path_result = join(out_path, basename(exp_file))
         print 'path_result ' + path_result
     
-        # result = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
-        # result = (255-gray_image)
-
         # assert np.array_equal(np.array(noshadow), np.array(shadow - result))
         cv2.imwrite(path_result, result)

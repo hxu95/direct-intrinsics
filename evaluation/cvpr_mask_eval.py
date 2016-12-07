@@ -11,13 +11,17 @@ import cv2
 import os
 
 # project_path = '/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/'
-# project_path = '/home/hxu/di-final/'
-project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
+project_path = '/home/hxu/di-final/'
+# project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
 # not sure these paths are right
 # point to generated data with shadows
 # result_path = 'data/synthetic/images/results/'
+
+# generated shadow masks from CNN
 result_path = 'data/cvpr11/shadow'
-noshadow_path = 'data/cvpr11/noshadow'
+
+# gt
+noshadow_path = 'data/cvpr11/shadowmask'
 
 # path to folders for results and ground truth
 # in the synthetic case they are 1:1
@@ -48,10 +52,10 @@ for (dirpath, dirnames, filenames) in os.walk(truth_path):
         print key
         print value
 '''
-print truth_dict
 
 
 # now do the experiment
+# prefixes may not be unique
 for (dirpath, dirnames, filenames) in os.walk(experiment_path):
     for filename in filenames:
         # key = prefix
@@ -72,13 +76,10 @@ for (dirpath, dirnames, filenames) in os.walk(experiment_path):
         print key
         print value
 '''
-cumulative_rmse = 0
-cumulative_ssim = 0
+cumulative_diff = 0
 count = 0
 # check that they are the same size
 assert len(experiment_dict) == len(truth_dict)
-
-total_error = 0
 
 # iterate over dictionary
 for key in truth_dict:
@@ -87,6 +88,10 @@ for key in truth_dict:
     gt_file = truth_dict[key]
     print 'truth: {}'.format(gt_file)
     gt_img = cv2.imread(gt_file)
+
+    # bw mask
+    gt_mask = cv2.cvtColor(gt_img, cv2.COLOR_BGR2LAB)
+    gt_l_channel, _, _ = cv2.split(gt_mask)
 
     if gt_img is None:
         continue
@@ -107,25 +112,34 @@ for key in truth_dict:
 
         exp_img = cv2.imread(exp_file)
 
-        if gt_img is None or exp_img is None:
-            continue
-
         #truth, experiment
         assert gt_img.shape == exp_img.shape
-        r = rmse(gt_img, exp_img)
-        # r = sqrt(mean_squared_error(gt_img, exp_img))
-        # can also use structural similarity
-        # have to convert to gray: http://stackoverflow.com/questions/32077285/ssim-image-compare-error-window-shape-incompatible-with-arr-in-shape
-        img1 = color.rgb2gray(gt_img)
-        img2 = color.rgb2gray(exp_img)
-        s = ssim(img1, img2)
 
+        # in greyscale
+        exp_mask = cv2.cvtColor(exp_img, cv2.COLOR_BGR2LAB)
+        exp_l_channel, _, _ = cv2.split(exp_mask)
+
+        #convert into bw
+        # thresholding less than
+        exp_l_channel[exp_l_channel < 50] = 0
+
+        # everything else to white
+        exp_l_channel[exp_l_channel > 0] = 255
+
+        # print 'exp_l'
+        # print exp_l_channel
+
+        # print 'gt_l'
+        # print gt_l_channel
+
+        assert gt_l_channel.size == exp_l_channel.size
         # add to total
-        cumulative_rmse += r
-        cumulative_ssim += s
+        diff = np.sum(np.array(gt_l_channel) == np.array(exp_l_channel)) / float(gt_l_channel.size)
+        cumulative_diff += diff
+
+        break
+    break
 
 # report average difference
-print 'RMSE'
-print float(cumulative_rmse) / float(len(truth_dict))
-print 'SSIM'
-print float(cumulative_ssim) / float(len(truth_dict))
+print 'Average difference (%)'
+print float(cumulative_diff) / float(len(truth_dict))
