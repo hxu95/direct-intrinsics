@@ -3,12 +3,6 @@ from os.path import join, dirname
 
 from util import rmse #, ssim, msssim
 
-# skimage installation instructions
-# http://stackoverflow.com/questions/38087558/import-error-no-module-named-skimage
-# deprecated?
-# from skimage.measure import structural_similarity as ssim
-from skimage.measure import compare_ssim as compare_ssim
-
 from skimage import color
 
 import sys, cv2
@@ -17,16 +11,19 @@ import os
 
 # path to direct intrinsics folder 
 # project_path = '/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/'
-project_path = '/home/hxu/di-final/'
-# project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
+# project_path = '/home/hxu/di-final/'
+project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
 
 
 # point to generated data with shadows
 # result_path = 'data/synthetic/images/results/'
-result_path = 'data/synthetic/images/shadow/'
+
+# path to generated shadow masks
+# result_path = 'data/synthetic/images/generated_mask/'
+result_path = 'data/synthetic/images/greyscale_shadowmask/'
 
 # ground truth
-noshadow_path = 'data/synthetic/images/noshadow/'
+noshadow_path = 'data/synthetic/images/bw_shadowmask/'
 
 # path to folders for results and ground truth
 # in the synthetic case they are 1:1
@@ -85,8 +82,7 @@ for (dirpath, dirnames, filenames) in os.walk(experiment_path):
 # check that they are the same size
 assert len(experiment_dict) == len(truth_dict)
 
-cumulative_rmse = 0
-cumulative_ssim = 0
+cumulative_diff = 0
 
 # iterate over dictionary
 for key in experiment_dict:
@@ -109,20 +105,34 @@ for key in experiment_dict:
 
     #truth, experiment
     assert gt_img.shape == exp_img.shape
-    r = rmse(gt_img, exp_img)
-    # r = sqrt(mean_squared_error(gt_img, exp_img))
-    # can also use structural similarity
-    # have to convert to gray: http://stackoverflow.com/questions/32077285/ssim-image-compare-error-window-shape-incompatible-with-arr-in-shape
-    img1 = color.rgb2gray(gt_img)
-    img2 = color.rgb2gray(exp_img)
-    s = compare_ssim(img1, img2)
 
+    # in greyscale
+    exp_mask = cv2.cvtColor(exp_img, cv2.COLOR_BGR2LAB)
+    exp_l_channel, _, _ = cv2.split(exp_mask)
+
+    #convert into bw
+    # thresholding less than
+    exp_l_channel[exp_l_channel < 50] = 0
+
+    # everything else to white
+    exp_l_channel[exp_l_channel > 0] = 255
+
+    # print 'exp_l'
+    # print exp_l_channel
+    # bw mask
+    gt_mask = cv2.cvtColor(gt_img, cv2.COLOR_BGR2LAB)
+    gt_l_channel, _, _ = cv2.split(gt_mask)
+
+    # print 'gt_l'
+    # print gt_l_channel
+
+    assert gt_l_channel.size == exp_l_channel
     # add to total
-    cumulative_rmse += r
-    cumulative_ssim += s
+    diff = np.sum(np.array(gt_l_channel) == np.array(exp_l_channel)) / float(gt_l_channel.size)
+    cumulative_diff += diff
+
+    # break
 
 # report average difference
-print 'RMSE'
-print float(cumulative_rmse) / float(len(truth_dict))
-print 'SSIM'
-print float(cumulative_ssim) / float(len(truth_dict))
+print 'Average difference (%)'
+print float(cumulative_diff) / float(len(truth_dict))

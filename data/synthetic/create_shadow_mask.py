@@ -52,17 +52,18 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
         try: os.makedirs(dir_o)
         except: pass
 
+        '''
         print shadow_a_channel
         print noshadow_a_channel
         print shadow_b_channel
         print noshadow_b_channel
+        '''
 
         # account for wraparound
         result = noshadow_l_channel - shadow_l_channel
         result[result > 230] = 0
         result = cv2.merge([result, shadow_a_channel, shadow_b_channel])
         
-        print result
         print 'path_shadow: ' + path_shadow
         print 'path_noshadow: ' + path_noshadow
 
@@ -71,7 +72,7 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
 
         # imwrite uses BGR so convert first?
         # http://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html
-        result = cv2.cvtColor(result, cv2.COLOR_LAB2BGR)
+        # result = cv2.cvtColor(result, cv2.COLOR_LAB2BGR)
 
         # write greyscale mask
         cv2.imwrite(path_result, result)
@@ -85,16 +86,16 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
         path_bw = join(dir_o, basename(path_shadow))
         print 'path_bw: ' + path_bw
 
+        result = noshadow_l_channel - shadow_l_channel
+
         # thresholding less than
         result[result < 50] = 0
 
         # everything else to white
         result[result > 0] = 255
 
-        #result = cv2.cvtColor(result, cv2.COLOR_LAB2BGR)
+        # result = cv2.merge([result, shadow_a_channel, shadow_b_channel])
+        # result = cv2.cvtColor(result, cv2.COLOR_LAB2BGR)
 
         # write bw mask
         cv2.imwrite(path_bw, result)
-
-        
-    break
