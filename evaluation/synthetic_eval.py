@@ -23,14 +23,13 @@ project_path = '/home/hxu/di-final/'
 
 # point to generated data with shadows
 # result_path = 'data/synthetic/images/results/'
-result_path = 'data/synthetic/images/shadow/'
-
+result_path = 'data/synthetic/images/test_predicted/'
+# result_path = 'data/synthetic/images/test_channel_prediction/'
 # ground truth
-noshadow_path = 'data/synthetic/images/noshadow/'
+noshadow_path = 'data/synthetic/images/test_noshadow/'
 
 # path to folders for results and ground truth
 # in the synthetic case they are 1:1
-
 # path to experimental results
 experiment_path = project_path + result_path
 
@@ -108,6 +107,10 @@ for key in experiment_dict:
         continue
 
     #truth, experiment
+    # print 'gt shape: ' + str(gt_img.shape)
+    # print 'exp shape: ' + str(exp_img.shape)
+    exp_img = cv2.resize(exp_img, (gt_img.shape[1], gt_img.shape[0])) 
+
     assert gt_img.shape == exp_img.shape
     r = rmse(gt_img, exp_img)
     # r = sqrt(mean_squared_error(gt_img, exp_img))

@@ -17,7 +17,7 @@ project_path = '/home/hxu/di-final/'
 # result_path = 'data/synthetic/images/results/'
 
 
-root = 'data/cvpr11/'
+root = 'data/cvpr10/'
 result_path = root + 'shadow'
 
 # gt path
@@ -43,41 +43,23 @@ truth_dict = {}
 # prefixes should be unique
 for (dirpath, dirnames, filenames) in os.walk(truth_path):
     for filename in filenames:
-        # key = prefix
-        key = filename.split("_")[0]
 
         # value = path to this image
         value = os.sep.join([dirpath, filename])
 
-        truth_dict[key] = value
+        truth_dict[filename] = value
 
-'''
-        print filename
-        print key
-        print value
-'''
-print truth_dict
 
 # now do the shadow
 for (dirpath, dirnames, filenames) in os.walk(shadow_path):
     for filename in filenames:
-        # key = prefix
-        key = filename.split("_")[0]
-
         # value = path to this image
         value = os.sep.join([dirpath, filename])
 
         # already exists in the dict
         # can be many to one
-        if shadow_dict.get(key, None) is not None:
-            shadow_dict[key].append(value)
-        else:
-            shadow_dict[key] = [value]
+        shadow_dict[filename] = value
 
-
-cumulative_rmse = 0
-cumulative_ssim = 0
-count = 0
 # check that they are the same size
 assert len(shadow_dict) == len(truth_dict)
 
@@ -104,44 +86,40 @@ for key in truth_dict:
     # otherwise, run through the shadows
     # get comparisons
 
-    files = shadow_dict[key]
-    for exp_file in files:
-        
-        count = count + 1
+    exp_file = shadow_dict[key]
+    # read in the images - can also read in as greyscale?
+    # to_grayscale(imread(file1).astype(float))
 
-        # read in the images - can also read in as greyscale?
-        # to_grayscale(imread(file1).astype(float))
+    exp_img = cv2.imread(exp_file)
 
-        exp_img = cv2.imread(exp_file)
+    # convert to LAB
+    shadow = cv2.cvtColor(exp_img, cv2.COLOR_BGR2LAB)
+    shadow_l_channel, _, _ = cv2.split(shadow)
 
-        # convert to LAB
-        shadow = cv2.cvtColor(exp_img, cv2.COLOR_BGR2LAB)
-        shadow_l_channel, _, _ = cv2.split(shadow)
+    # subtract channels?
+    result = noshadow_l_channel - shadow_l_channel
 
-        # subtract channels?
-        result = noshadow_l_channel - shadow_l_channel
+    # account for wraparound
+    result[result > 200] = 0
 
-        # account for wraparound
-        result[result > 200] = 0
+    # small distances -> no difference
+    result[result < 25] = 0
 
-        # small distances -> no difference
-        result[result < 25] = 0
+    # set non-shadow to black?
+    result[result > 0] = 255
 
-        # set non-shadow to black?
-        result[result > 0] = 255
+    # not sure why we have to invert but we do, i guess
+    if basename(exp_file).startswith('a'):
+        # print 'starts with a'
+        result = (255 - result)
 
-        # not sure why we have to invert but we do, i guess
-        if basename(exp_file).startswith('a'):
-            # print 'starts with a'
-            result = (255 - result)
+    # dir_o = join(dir_out, basename(dir_scene))
+    try: os.makedirs(out_path)
+    except: pass
 
-        # dir_o = join(dir_out, basename(dir_scene))
-        try: os.makedirs(out_path)
-        except: pass
+    print 'path_shadow: ' + exp_file
+    path_result = join(out_path, basename(exp_file))
+    print 'path_result ' + path_result
 
-        print 'path_shadow: ' + exp_file
-        path_result = join(out_path, basename(exp_file))
-        print 'path_result ' + path_result
-    
-        # assert np.array_equal(np.array(noshadow), np.array(shadow - result))
-        cv2.imwrite(path_result, result)
+    # assert np.array_equal(np.array(noshadow), np.array(shadow - result))
+    cv2.imwrite(path_result, result)

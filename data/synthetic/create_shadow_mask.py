@@ -16,8 +16,13 @@ parser.add_argument('--dir_data', default='.')
 
 args = parser.parse_args()
 
-dir_shadow = join(args.dir_data, 'images', 'shadow')
-dir_noshadow = join(args.dir_data, 'images', 'noshadow')
+# inputs 
+dir_shadow = join(args.dir_data, 'images', 'test_shadow')
+# dir_noshadow = join(args.dir_data, 'images', 'noshadow')
+# use the predicted
+dir_noshadow = join(args.dir_data, 'images', 'test_predicted')
+
+# outputs
 dir_out = join(args.dir_data, 'images', 'greyscale_shadowmask')
 dir_bw = join(args.dir_data, 'images', 'bw_shadowmask')
 
@@ -27,24 +32,24 @@ prefix = './images/shadow'
 for dir_scene in sorted(glob(join(dir_shadow, '*'))):
     for path_shadow in sorted(glob(join(dir_scene, '*.png'))):
 
-#image2 = mpimg.imread(noshadow_path + path)
-#image3 = image1 - image2
-
         shadow = cv2.imread(path_shadow)
         shadow = cv2.cvtColor(shadow, cv2.COLOR_BGR2LAB)
         shadow_l_channel, shadow_a_channel, shadow_b_channel = cv2.split(shadow)
-        # print shadow
-        # mask = np.repeat((albedo.mean(2) != 0).astype(np.uint8)[..., np.newaxis] * 255, 3, 2)
 
-        #f = os.path.join(path, filename)
         f = None
         if path_shadow.startswith(dir_shadow):
             f = path_shadow[len(dir_shadow) + 1:]
 
         path_noshadow = join(dir_noshadow, f)
-        # print path_noshadow
+        print path_noshadow
+        
         #path_noshadow = join(path_noshadow, basename(path_shadow))
         noshadow = cv2.imread(path_noshadow)
+
+        # sometimes we get rounding errors - reshape to fix them
+        if noshadow.shape != shadow.shape:
+            noshadow = cv2.resize(noshadow, (shadow.shape[1], shadow.shape[0])) 
+
         noshadow = cv2.cvtColor(noshadow, cv2.COLOR_BGR2LAB)
         noshadow_l_channel, noshadow_a_channel, noshadow_b_channel = cv2.split(noshadow)
 
@@ -52,17 +57,10 @@ for dir_scene in sorted(glob(join(dir_shadow, '*'))):
         try: os.makedirs(dir_o)
         except: pass
 
-        '''
-        print shadow_a_channel
-        print noshadow_a_channel
-        print shadow_b_channel
-        print noshadow_b_channel
-        '''
-
         # account for wraparound
         result = noshadow_l_channel - shadow_l_channel
         result[result > 230] = 0
-        result = cv2.merge([result, shadow_a_channel, shadow_b_channel])
+        # result = cv2.merge([result, shadow_a_channel, shadow_b_channel])
         
         print 'path_shadow: ' + path_shadow
         print 'path_noshadow: ' + path_noshadow

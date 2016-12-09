@@ -43,42 +43,25 @@ truth_dict = {}
 for (dirpath, dirnames, filenames) in os.walk(truth_path):
     for filename in filenames:
         # key = prefix
-        key = filename.split("_")[0]
+        # key = filename.split("_")[0]
 
         # value = path to this image
         value = os.sep.join([dirpath, filename])
 
-        truth_dict[key] = value
-
-'''
-        print filename
-        print key
-        print value
-'''
-
+        truth_dict[filename] = value
 
 # now do the experiment
 # prefixes may not be unique
 for (dirpath, dirnames, filenames) in os.walk(experiment_path):
     for filename in filenames:
-        # key = prefix
-        key = filename.split("_")[0]
-
         # value = path to this image
         value = os.sep.join([dirpath, filename])
 
         # already exists in the dict
         # can be many to one
-        if experiment_dict.get(key, None) is not None:
-            experiment_dict[key].append(value)
-        else:
-            experiment_dict[key] = [value]
+        experiment_dict[filename] = value
 
-'''
-        print filename
-        print key
-        print value
-'''
+
 cumulative_diff = 0
 count = 0
 # check that they are the same size
@@ -103,41 +86,36 @@ for key in truth_dict:
     if gt_img is None:
         continue
 
-    # otherwise, run through the experiments
-    # get comparisons
-    files = experiment_dict[key]
-    for exp_file in files:
-        
-        count = count + 1
+    count = count + 1
 
-        # get matching files
-        gt_file = truth_dict[key]
-        print 'experiment: {}'.format(exp_file)
+    # get matching files
+    exp_file = experiment_dict[key]
+    print 'experiment: {}'.format(exp_file)
 
-        # read in the images - can also read in as greyscale?
-        # to_grayscale(imread(file1).astype(float))
+    # read in the images - can also read in as greyscale?
+    # to_grayscale(imread(file1).astype(float))
 
-        exp_img = cv2.imread(exp_file)
+    exp_img = cv2.imread(exp_file)
 
-        #truth, experiment
-        assert gt_img.shape == exp_img.shape
+    #truth, experiment
+    assert gt_img.shape == exp_img.shape
 
-        # in greyscale
-        exp_mask = cv2.cvtColor(exp_img, cv2.COLOR_BGR2LAB)
-        exp_l_channel, _, _ = cv2.split(exp_mask)
+    # in greyscale
+    exp_mask = cv2.cvtColor(exp_img, cv2.COLOR_BGR2LAB)
+    exp_l_channel, _, _ = cv2.split(exp_mask)
 
-        #convert into bw
-        # thresholding less than
-        exp_l_channel[exp_l_channel < 50] = 0
+    #convert into bw
+    # thresholding less than
+    exp_l_channel[exp_l_channel < 50] = 0
 
-        # everything else to white
-        exp_l_channel[exp_l_channel > 0] = 255
+    # everything else to white
+    exp_l_channel[exp_l_channel > 0] = 255
 
 
-        assert gt_l_channel.size == exp_l_channel.size
-        # add to total
-        diff = np.sum(np.array(gt_l_channel) == np.array(exp_l_channel)) / float(gt_l_channel.size)
-        cumulative_diff += diff
+    assert gt_l_channel.size == exp_l_channel.size
+    # add to total
+    diff = np.sum(np.array(gt_l_channel) == np.array(exp_l_channel)) / float(gt_l_channel.size)
+    cumulative_diff += diff
 
 
 # report average difference

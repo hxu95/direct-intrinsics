@@ -2,7 +2,7 @@
 from os.path import join, dirname
 
 # to do evaluation - mse or ssim?
-from skimage.measure import structural_similarity as ssim
+from skimage.measure import compare_ssim as compare_ssim
 from skimage import color
 from util import rmse
 import sys
@@ -11,12 +11,15 @@ import cv2
 import os
 
 # project_path = '/afs/csail.mit.edu/u/y/ylkuo/project/cv_final/direct-intrinsics/'
-# project_path = '/home/hxu/di-final/'
-project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
+project_path = '/home/hxu/di-final/'
+# project_path = '/home/hxu/6.869/direct-intrinsics-final-project/'
 # not sure these paths are right
 # point to generated data with shadows
 # result_path = 'data/synthetic/images/results/'
-result_path = 'data/cvpr11/shadow'
+# result_path = 'data/cvpr11/shadow'
+result_path = 'data/cvpr11/test_predicted'
+# result_path = 'data/cvpr11/test_channel_prediction'
+# ground truth
 noshadow_path = 'data/cvpr11/noshadow'
 
 # path to folders for results and ground truth
@@ -118,7 +121,7 @@ for key in truth_dict:
         # have to convert to gray: http://stackoverflow.com/questions/32077285/ssim-image-compare-error-window-shape-incompatible-with-arr-in-shape
         img1 = color.rgb2gray(gt_img)
         img2 = color.rgb2gray(exp_img)
-        s = ssim(img1, img2)
+        s = compare_ssim(img1, img2)
 
         # add to total
         cumulative_rmse += r
